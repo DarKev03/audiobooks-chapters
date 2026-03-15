@@ -1,0 +1,14 @@
+# Chaptr — Dependencias Python
+# Instalar con: pip install -r requirements.txt
+
+# Transcripción de audio (incluye torch como dependencia)
+openai-whisper
+
+# Cliente Ollama para Python
+ollama
+
+# PyTorch con soporte CUDA 12.1 (RTX 3060)
+# Si ya lo tienes instalado, puedes comentar estas líneas
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch
+torchaudio

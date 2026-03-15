@@ -1,0 +1,57 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Chaptr — Flujo completo",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "args": [
+                "${input:audioFile}",
+                "--whisper-model",
+                "small",
+                "--llm-model",
+                "mistral:7b",
+                "--save-transcript"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Chaptr — Saltar transcripción (iterar)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "args": [
+                "${input:audioFile}",
+                "--skip-transcription",
+                "--transcript",
+                "${input:transcriptFile}"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Chaptr — Solo exportar M4B (test FFmpeg)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/exporter.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ],
+    "inputs": [
+        {
+            "id": "audioFile",
+            "type": "promptString",
+            "description": "Ruta al archivo de audio (MP3, M4A, M4B)",
+            "default": "prueba.mp3"
+        },
+        {
+            "id": "transcriptFile",
+            "type": "promptString",
+            "description": "Ruta al JSON de transcripción guardado",
+            "default": "prueba_transcript.json"
+        }
+    ]
+}
