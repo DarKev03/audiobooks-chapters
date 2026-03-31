@@ -68,29 +68,30 @@ pip install -r requirements.txt
 ### Comandos comunes
 
 ```bash
-# Uso estándar (MP3 a M4B con capítulos)
-python main.py "Libro.mp3"
+# Uso estándar (MP3 a M4B con capítulos) desde la raíz
+python engine/main.py "Libro.mp3"
 
-# Con metadatos personalizados
-python main.py "Libro.mp3" --title "Título" --author "Autor"
+# Modo Modular (Para integraciones con UI)
+# Fase 1: Solo detectar (devuelve JSON de capítulos)
+python engine/main.py "Libro.mp3" --detect-only --json-mode
 
-# Guardar transcripción para iterar después
-python main.py "Libro.mp3" --save-transcript
-
-# Re-generar capítulos sin repetir el paso de Whisper
-python main.py "Libro.mp3" --skip-transcription --transcript "Libro_transcript.json"
-
-# Cambiar de modelo LLM al vuelo
-python main.py "Libro.mp3" --llm-model llama3.1:8b
+# Fase 2: Solo exportar (usa un JSON externo y metadatos)
+python engine/main.py "Libro.mp3" --export-only --chapters-json "caps.json" --title "Mi Libro" --author "Autor" --cover "portada.jpg"
 ```
 
 ### Opciones avanzadas
 
 | Opción | Default | Descripción |
 |---|---|---|
+| `--json-mode` | `False` | Emite la salida en formato JSON (ideal para UI) |
+| `--detect-only`| `False` | Termina tras la detección y emite los capítulos en JSON |
+| `--export-only`| `False` | No detecta; solo genera el M4B con los datos recibidos |
+| `--chapters-json`| `None` | String o ruta al JSON de capítulos para `--export-only` |
 | `--llm-model` | `mistral:7b` | Modelo en Ollama para validar capítulos |
 | `--whisper-model` | `small` | Tamaño del modelo (base, small, medium, large-v3...) |
-| `--ollama-host` | `http://localhost:11434` | Endpoint de tu servidor Ollama |
+| `--title` | `None` | Título personalizado para los metadatos |
+| `--author` | `None` | Autor/Artista personalizado para los metadatos |
+| `--cover` | `None` | Ruta a una imagen (JPG/PNG) para la portada |
 | `-o / --output` | `(auto)` | Ruta del M4B de salida |
 
 ---

@@ -70,15 +70,20 @@ def export_m4b(
     audio_path: str,
     chapters: list[dict],
     output_path: str,
+    metadata: dict = None,
+    cover_path: str = None,
 ) -> None:
     """
     Genera el M4B final con los capítulos incrustados.
-    Los metadatos del audio original (título, autor, portada...) se conservan.
+    Los metadatos del audio original (título, autor, portada...) se conservan,
+    a menos que se proporcionen nuevos.
 
     Args:
         audio_path: Ruta al audio original
         chapters: Lista de capítulos detectados
         output_path: Ruta del M4B de salida
+        metadata: Dict opcional con 'title' y 'author'
+        cover_path: Ruta opcional a una nueva imagen de portada
     """
     print("[Exporter] Obteniendo duración del audio...")
     duration = get_audio_duration(audio_path)
@@ -99,13 +104,27 @@ def export_m4b(
         cmd = [
             "ffmpeg",
             "-y",                        # Sobreescribir sin preguntar
-            "-i", audio_path,            # Audio original
-            "-i", meta_path,             # Fichero solo con capítulos
+            "-i", audio_path,            # Audio original [0]
+            "-i", meta_path,             # Fichero solo con capítulos [1]
+        ]
+        
+        if cover_path and os.path.isfile(cover_path):
+            cmd += ["-i", cover_path]      # Nueva portada [2]
+            cover_input_index = 2
+        else:
+            cover_input_index = 0
+
+        cmd += [
             "-map_metadata", "0",        # Conservar metadatos del audio original
             "-map_chapters", "1",        # Usar capítulos del fichero temporal
-            "-map", "0:a",               # Mapear audio
-            "-map", "0:v?",              # Mapear video/portada (si existe)
+            "-map", "0:a",               # Mapear audio de la fuente 0
         ]
+        
+        # Mapear la portada (v)
+        if cover_input_index == 2:
+            cmd += ["-map", "2:v"]       # Usar la nueva portada
+        else:
+            cmd += ["-map", "0:v?"]      # Usar la original si existe
 
         # Si el input ya es AAC (m4a/m4b), copiar directamente; si no, convertir
         if input_ext in (".m4a", ".m4b", ".aac"):
@@ -113,6 +132,15 @@ def export_m4b(
         else:
             # MP3 → AAC para máxima compatibilidad con Apple Books
             cmd += ["-c:a", "aac", "-b:a", "128k"]
+
+        # Aplicar metadatos personalizados si existen
+        if metadata:
+            if "title" in metadata and metadata["title"]:
+                cmd += ["-metadata:g", f"title={metadata['title']}"]
+            if "author" in metadata and metadata["author"]:
+                # En M4B/iTunes, 'artist' es el Autor
+                cmd += ["-metadata:g", f"artist={metadata['author']}"]
+                cmd += ["-metadata:g", f"album_artist={metadata['author']}"]
 
         cmd += [
             "-c:v", "mjpeg",          # convierte PNG → JPEG
