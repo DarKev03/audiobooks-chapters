@@ -10,7 +10,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 sdist/
@@ -44,7 +44,7 @@ env/
 *_transcript.json
 *_chapters.m4b
 *.txt
-*.json
+# *.json (removed so it doesn't ignore UI config files)
 !requirements.txt
 !package.json
 
